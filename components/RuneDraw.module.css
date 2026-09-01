@@ -1,0 +1,163 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--verdigris);
+}
+
+.stage {
+  width: 100%;
+  min-height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.nameDisplay {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  color: var(--paper);
+  letter-spacing: 0.01em;
+  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: inline-block;
+}
+
+.cycling {
+  color: var(--wheat);
+  filter: blur(0.2px);
+}
+
+.revealMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-width: 46ch;
+}
+
+.badge {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--verdigris);
+  color: var(--verdigris);
+}
+
+.subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--paper-dim);
+}
+
+.preview {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--paper-dim);
+}
+
+.previewLabel {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--verdigris-dim);
+}
+
+.nextStepNote {
+  font-size: 0.8rem;
+  color: var(--paper-dim);
+  font-style: italic;
+}
+
+.drawButton {
+  background: var(--wheat);
+  color: var(--ink);
+  border: none;
+  border-radius: 8px;
+  padding: 0.85rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: opacity 200ms ease, transform 150ms ease;
+}
+
+.drawButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.drawButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.drawButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.interpretButton {
+  background: none;
+  border: 1px solid var(--verdigris);
+  color: var(--verdigris);
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 0.92rem;
+  transition: border-color 200ms ease, color 200ms ease, background 200ms ease;
+}
+
+.interpretButton:hover {
+  border-color: var(--wheat);
+  color: var(--wheat);
+}
+
+.interpretLoading {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: var(--paper-dim);
+}
+
+.interpretError {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  color: var(--danger);
+  font-size: 0.9rem;
+  max-width: 46ch;
+}
+
+.interpretResult {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 52ch;
+  padding: 1.25rem;
+  border-left: 2px solid var(--wheat);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--paper);
+}
+
+.interpretNote {
+  font-style: italic;
+  color: var(--paper-dim);
+  font-size: 0.9rem;
+}

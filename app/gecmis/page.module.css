@@ -1,0 +1,192 @@
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 4rem) 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  color: var(--paper);
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  color: var(--paper-dim);
+  font-size: 0.95rem;
+}
+
+.backLink {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--verdigris);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.backLink:hover {
+  color: var(--wheat);
+}
+
+.loading {
+  font-family: var(--font-mono);
+  color: var(--paper-dim);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2.5rem 1.5rem;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  text-align: center;
+  color: var(--paper-dim);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dayGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dayHeading {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--verdigris);
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--ink-raised);
+  overflow: hidden;
+}
+
+.cardHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 1rem 1.25rem;
+  text-align: left;
+}
+
+.cardTime {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--paper-dim);
+  display: block;
+}
+
+.cardTopic {
+  font-size: 0.92rem;
+  color: var(--paper-dim);
+}
+
+.cardRuneName {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reversedTag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+}
+
+.cardBody {
+  padding: 0 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.miniRows {
+  display: flex;
+  gap: 2rem;
+  margin: 1rem 0 0;
+}
+
+.miniRows dt {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--verdigris-dim);
+}
+
+.miniRows dd {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--paper);
+}
+
+.interpretation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--paper);
+  border-left: 2px solid var(--wheat);
+  padding-left: 1rem;
+}
+
+.interpretationNote {
+  font-style: italic;
+  color: var(--paper-dim);
+  font-size: 0.85rem;
+}
+
+.noInterpretation {
+  font-size: 0.85rem;
+  color: var(--paper-dim);
+  font-style: italic;
+}
+
+.clearButton {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.85rem;
+}
+
+.clearButton:hover {
+  background: var(--danger);
+  color: var(--ink);
+}
