@@ -181,6 +181,10 @@ export default function UserIntakeForm() {
 }
 
 function ProfileSummary({ profile, onBack }) {
+  const [overviewPhase, setOverviewPhase] = useState("idle"); // idle | loading | done | error
+  const [overviewResult, setOverviewResult] = useState(null);
+  const [overviewMessage, setOverviewMessage] = useState(null);
+
   const rows = useMemo(
     () => [
       { label: "Kişisel ana rune", value: profile.personal.name },
@@ -191,6 +195,36 @@ function ProfileSummary({ profile, onBack }) {
     ],
     [profile]
   );
+
+  async function fetchOverview() {
+    setOverviewPhase("loading");
+    setOverviewMessage(null);
+    try {
+      const res = await fetch("/api/profile-overview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          personalRune: profile.personal,
+          characterRune: profile.character,
+          yearlyRune: profile.yearly,
+          monthlyRune: profile.monthly,
+          dailyVibrationRune: profile.dailyVibration,
+          userName: profile.name,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setOverviewResult(data.data);
+        setOverviewPhase("done");
+      } else {
+        setOverviewMessage(data.message || "Değerlendirme şu an oluşturulamadı.");
+        setOverviewPhase("error");
+      }
+    } catch (err) {
+      setOverviewMessage("Bağlantı kurulamadı. Lütfen internet bağlantını kontrol edip tekrar dene.");
+      setOverviewPhase("error");
+    }
+  }
 
   return (
     <div className={styles.summary}>
@@ -208,6 +242,35 @@ function ProfileSummary({ profile, onBack }) {
           </div>
         ))}
       </dl>
+
+      <div className={styles.overviewBlock}>
+        {overviewPhase === "idle" && (
+          <button type="button" className={styles.overviewButton} onClick={fetchOverview}>
+            Genel değerlendirmemi göster
+          </button>
+        )}
+        {overviewPhase === "loading" && (
+          <p className={styles.overviewLoading} aria-live="polite">
+            Profilin değerlendiriliyor…
+          </p>
+        )}
+        {overviewPhase === "error" && (
+          <div className={styles.overviewError} role="alert">
+            <p>{overviewMessage}</p>
+            <button type="button" className={styles.overviewButton} onClick={fetchOverview}>
+              Tekrar dene
+            </button>
+          </div>
+        )}
+        {overviewPhase === "done" && overviewResult && (
+          <div className={styles.overviewResult}>
+            <p>{overviewResult.opening}</p>
+            <p>{overviewResult.connection}</p>
+            <p>{overviewResult.guidance}</p>
+            <p className={styles.overviewNote}>{overviewResult.note}</p>
+          </div>
+        )}
+      </div>
 
       <RuneDraw
         topic={profile.topic}

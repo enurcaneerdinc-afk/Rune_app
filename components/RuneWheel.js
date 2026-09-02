@@ -16,9 +16,25 @@ const CENTER = SIZE / 2;
 const OUTER_R = 190;
 const INNER_R = 128;
 
+// rune-engine.js'teki RUNE_NAMES ile AYNI SIRA (1=Fehu ... 24=Othala).
+// Gerçek Elder Futhark Unicode karakterleri. Her cihazda garanti doğru
+// görünmesi için proje, bu karakterleri destekleyen "Noto Sans Runic"
+// yazı tipini kendi içinde taşıyor (bkz. app/globals.css, --font-runic) —
+// kullanıcının telefonunda bu yazı tipi kurulu olmasa bile çalışır.
+const RUNE_GLYPHS = [
+  "ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ",
+  "ᚺ", "ᚾ", "ᛁ", "ᛃ", "ᛇ", "ᛈ", "ᛉ", "ᛊ",
+  "ᛏ", "ᛒ", "ᛖ", "ᛗ", "ᛚ", "ᛜ", "ᛞ", "ᛟ",
+];
+
 function polar(cx, cy, r, angleDeg) {
   const rad = ((angleDeg - 90) * Math.PI) / 180;
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function sliceCenterAngle(index) {
+  const anglePer = 360 / SLICE_COUNT;
+  return index * anglePer + anglePer / 2;
 }
 
 function slicePath(index) {
@@ -41,13 +57,13 @@ function slicePath(index) {
   ].join(" ");
 }
 
-export default function RuneWheel({ activeId = null, label = null }) {
+export default function RuneWheel({ activeId = null, label = null, maxWidth = 420 }) {
   return (
     <svg
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       role="img"
       aria-label={label ? `Doğum takviminde ${label} dilimi aydınlanmış` : "24 dilimlik rune doğum takvimi"}
-      style={{ width: "100%", height: "auto", maxWidth: 420 }}
+      style={{ width: "100%", height: "auto", maxWidth }}
     >
       <circle cx={CENTER} cy={CENTER} r={OUTER_R + 6} fill="none" stroke="var(--line)" strokeWidth="1" />
       {Array.from({ length: SLICE_COUNT }).map((_, i) => {
@@ -63,6 +79,27 @@ export default function RuneWheel({ activeId = null, label = null }) {
             opacity={isActive ? 1 : 0.9}
             style={{ transition: "fill 400ms ease, opacity 400ms ease" }}
           />
+        );
+      })}
+      {Array.from({ length: SLICE_COUNT }).map((_, i) => {
+        const id = i + 1;
+        const isActive = activeId === id;
+        const angle = sliceCenterAngle(i);
+        const pos = polar(CENTER, CENTER, (OUTER_R + INNER_R) / 2, angle);
+        return (
+          <text
+            key={id}
+            x={pos.x}
+            y={pos.y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontFamily="var(--font-runic)"
+            fontSize="22"
+            fill={isActive ? "var(--ink)" : "var(--paper-dim)"}
+            style={{ transition: "fill 400ms ease", pointerEvents: "none" }}
+          >
+            {RUNE_GLYPHS[i]}
+          </text>
         );
       })}
       <circle cx={CENTER} cy={CENTER} r={INNER_R - 4} fill="var(--ink)" stroke="var(--line)" strokeWidth="1" />
