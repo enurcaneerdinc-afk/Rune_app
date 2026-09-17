@@ -25,7 +25,7 @@ export async function POST(request) {
     );
   }
 
-  const { personalRune, characterRune, yearlyRune, monthlyRune, dailyVibrationRune, userName } = body || {};
+  const { personalRune, characterRune, yearlyRune, monthlyRune, dailyVibrationRune, userName, lang } = body || {};
 
   if (!personalRune || !characterRune || !yearlyRune || !monthlyRune || !dailyVibrationRune) {
     return NextResponse.json(
@@ -44,6 +44,7 @@ export async function POST(request) {
       dailyVibrationRune,
       runesData,
       userName,
+      lang,
     });
   } catch (err) {
     return NextResponse.json({ ok: false, reason: "bad_request", message: err.message }, { status: 400 });

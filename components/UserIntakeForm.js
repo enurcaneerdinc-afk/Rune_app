@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import runeEngine from "../lib/rune-engine";
 import interpretationEngine from "../lib/interpretation-engine";
+import { t, topicLabel, errorMessage } from "../lib/i18n";
+import { useLanguage } from "./LanguageProvider";
 import RuneWheel from "./RuneWheel";
 import RuneDraw from "./RuneDraw";
 import styles from "./UserIntakeForm.module.css";
@@ -25,6 +27,7 @@ function isValidBirthDate(value) {
 }
 
 export default function UserIntakeForm() {
+  const { lang } = useLanguage();
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [showOptional, setShowOptional] = useState(false);
@@ -68,37 +71,32 @@ export default function UserIntakeForm() {
     <div className={styles.wrap}>
       <div className={styles.wheelColumn}>
         <RuneWheel activeId={activeWheelId} label={activeWheelLabel} />
-        <p className={styles.wheelCaption}>
-          Kişisel ana rune, kaynakta belirtilen iki döneme (Fehu ve Uruz) dayanarak hesaplanan
-          24 dilimlik bir takvimden geliyor — kesin bir gelenek değil, şeffaf bir varsayım.
-        </p>
+        <p className={styles.wheelCaption}>{t(lang, "wheelCaption")}</p>
       </div>
 
       <div className={styles.formColumn}>
         {!profile ? (
           <form className={styles.form} onSubmit={handleSubmit} noValidate>
             <div>
-              <h1 className={styles.title}>Rune profiline başla</h1>
-              <p className={styles.subtitle}>
-                Adını ve doğum tarihini gir, bugün hangi konuya bakmak istediğini seç.
-              </p>
+              <h1 className={styles.title}>{t(lang, "formTitle")}</h1>
+              <p className={styles.subtitle}>{t(lang, "formSubtitle")}</p>
             </div>
 
             <label className={styles.field}>
-              <span className={styles.label}>İsim</span>
+              <span className={styles.label}>{t(lang, "labelName")}</span>
               <input
                 className={styles.input}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Adın"
+                placeholder={t(lang, "placeholderName")}
                 autoComplete="given-name"
               />
-              {nameError && <span className={styles.error}>Lütfen bir isim gir.</span>}
+              {nameError && <span className={styles.error}>{t(lang, "errorName")}</span>}
             </label>
 
             <label className={styles.field}>
-              <span className={styles.label}>Doğum tarihi</span>
+              <span className={styles.label}>{t(lang, "labelBirthDate")}</span>
               <input
                 className={styles.input}
                 type="date"
@@ -106,11 +104,7 @@ export default function UserIntakeForm() {
                 max={TODAY_ISO}
                 onChange={(e) => setBirthDate(e.target.value)}
               />
-              {dateError && (
-                <span className={styles.error}>
-                  Lütfen geçerli bir doğum tarihi gir (bugünden ileri veya {MIN_YEAR}&apos;den önce olamaz).
-                </span>
-              )}
+              {dateError && <span className={styles.error}>{t(lang, "errorBirthDate", MIN_YEAR)}</span>}
             </label>
 
             <button
@@ -119,13 +113,13 @@ export default function UserIntakeForm() {
               onClick={() => setShowOptional((v) => !v)}
               aria-expanded={showOptional}
             >
-              {showOptional ? "− Doğum saati / yeri (opsiyonel)" : "+ Doğum saati / yeri ekle (opsiyonel)"}
+              {showOptional ? t(lang, "optionalToggleOpen") : t(lang, "optionalToggleClosed")}
             </button>
 
             {showOptional && (
               <div className={styles.optionalGroup}>
                 <label className={styles.field}>
-                  <span className={styles.label}>Doğum saati</span>
+                  <span className={styles.label}>{t(lang, "labelBirthTime")}</span>
                   <input
                     className={styles.input}
                     type="time"
@@ -134,42 +128,39 @@ export default function UserIntakeForm() {
                   />
                 </label>
                 <label className={styles.field}>
-                  <span className={styles.label}>Doğum yeri</span>
+                  <span className={styles.label}>{t(lang, "labelBirthPlace")}</span>
                   <input
                     className={styles.input}
                     type="text"
                     value={birthPlace}
                     onChange={(e) => setBirthPlace(e.target.value)}
-                    placeholder="Şehir, ülke"
+                    placeholder={t(lang, "placeholderBirthPlace")}
                   />
                 </label>
-                <p className={styles.optionalNote}>
-                  Bu bilgiler V1&apos;deki hesaplamayı etkilemiyor; ileride kullanılmak üzere
-                  şimdiden saklanıyor.
-                </p>
+                <p className={styles.optionalNote}>{t(lang, "optionalNote")}</p>
               </div>
             )}
 
             <fieldset className={styles.field} style={{ border: "none", padding: 0, margin: 0 }}>
-              <legend className={styles.label}>Bugün hangi konuya bakmak istersin?</legend>
+              <legend className={styles.label}>{t(lang, "labelTopicQuestion")}</legend>
               <div className={styles.topicGrid}>
-                {TOPICS.map((t) => (
+                {TOPICS.map((topicKey) => (
                   <button
                     type="button"
-                    key={t}
-                    className={`${styles.topicPill} ${topic === t ? styles.topicPillActive : ""}`}
-                    onClick={() => setTopic(t)}
-                    aria-pressed={topic === t}
+                    key={topicKey}
+                    className={`${styles.topicPill} ${topic === topicKey ? styles.topicPillActive : ""}`}
+                    onClick={() => setTopic(topicKey)}
+                    aria-pressed={topic === topicKey}
                   >
-                    {t}
+                    {topicLabel(lang, topicKey)}
                   </button>
                 ))}
               </div>
-              {topicError && <span className={styles.error}>Lütfen bir konu seç.</span>}
+              {topicError && <span className={styles.error}>{t(lang, "errorTopic")}</span>}
             </fieldset>
 
             <button type="submit" className={styles.submit}>
-              Profilimi gör
+              {t(lang, "submit")}
             </button>
           </form>
         ) : (
@@ -181,24 +172,30 @@ export default function UserIntakeForm() {
 }
 
 function ProfileSummary({ profile, onBack }) {
+  const { lang } = useLanguage();
   const [overviewPhase, setOverviewPhase] = useState("idle"); // idle | loading | done | error
   const [overviewResult, setOverviewResult] = useState(null);
-  const [overviewMessage, setOverviewMessage] = useState(null);
+  const [overviewReason, setOverviewReason] = useState(null);
 
   const rows = useMemo(
     () => [
-      { label: "Kişisel ana rune", value: profile.personal.name },
-      { label: "Karakter runesi", value: profile.character.name },
-      { label: "Yıllık rune", value: profile.yearly.name },
-      { label: "Aylık rune", value: profile.monthly.name },
-      { label: "Günün titreşimi", value: profile.dailyVibration.name },
+      { label: t(lang, "rowPersonal"), value: profile.personal.name },
+      { label: t(lang, "rowCharacter"), value: profile.character.name },
+      { label: t(lang, "rowYearly"), value: profile.yearly.name },
+      { label: t(lang, "rowMonthly"), value: profile.monthly.name },
+      { label: t(lang, "rowDaily"), value: profile.dailyVibration.name },
     ],
-    [profile]
+    [profile, lang]
   );
+
+  const lensText =
+    lang === "en"
+      ? interpretationEngine.TOPIC_LENS_EN[profile.topic] || interpretationEngine.TOPIC_LENS[profile.topic]
+      : interpretationEngine.TOPIC_LENS[profile.topic];
 
   async function fetchOverview() {
     setOverviewPhase("loading");
-    setOverviewMessage(null);
+    setOverviewReason(null);
     try {
       const res = await fetch("/api/profile-overview", {
         method: "POST",
@@ -210,6 +207,7 @@ function ProfileSummary({ profile, onBack }) {
           monthlyRune: profile.monthly,
           dailyVibrationRune: profile.dailyVibration,
           userName: profile.name,
+          lang,
         }),
       });
       const data = await res.json();
@@ -217,11 +215,11 @@ function ProfileSummary({ profile, onBack }) {
         setOverviewResult(data.data);
         setOverviewPhase("done");
       } else {
-        setOverviewMessage(data.message || "Değerlendirme şu an oluşturulamadı.");
+        setOverviewReason(data.reason || "default");
         setOverviewPhase("error");
       }
     } catch (err) {
-      setOverviewMessage("Bağlantı kurulamadı. Lütfen internet bağlantını kontrol edip tekrar dene.");
+      setOverviewReason("network_error");
       setOverviewPhase("error");
     }
   }
@@ -229,9 +227,9 @@ function ProfileSummary({ profile, onBack }) {
   return (
     <div className={styles.summary}>
       <div>
-        <span className={styles.summaryEyebrow}>{profile.name} için profil hazır</span>
-        <h1 className={styles.title}>{profile.topic}</h1>
-        <p className={styles.subtitle}>{interpretationEngine.TOPIC_LENS[profile.topic]}</p>
+        <span className={styles.summaryEyebrow}>{t(lang, "summaryEyebrow", profile.name)}</span>
+        <h1 className={styles.title}>{topicLabel(lang, profile.topic)}</h1>
+        <p className={styles.subtitle}>{lensText}</p>
       </div>
 
       <dl className={styles.rows}>
@@ -246,19 +244,19 @@ function ProfileSummary({ profile, onBack }) {
       <div className={styles.overviewBlock}>
         {overviewPhase === "idle" && (
           <button type="button" className={styles.overviewButton} onClick={fetchOverview}>
-            Genel değerlendirmemi göster
+            {t(lang, "overviewShow")}
           </button>
         )}
         {overviewPhase === "loading" && (
           <p className={styles.overviewLoading} aria-live="polite">
-            Profilin değerlendiriliyor…
+            {t(lang, "overviewLoading")}
           </p>
         )}
         {overviewPhase === "error" && (
           <div className={styles.overviewError} role="alert">
-            <p>{overviewMessage}</p>
+            <p>{errorMessage(lang, overviewReason)}</p>
             <button type="button" className={styles.overviewButton} onClick={fetchOverview}>
-              Tekrar dene
+              {t(lang, "overviewRetry")}
             </button>
           </div>
         )}
@@ -280,7 +278,7 @@ function ProfileSummary({ profile, onBack }) {
       />
 
       <button type="button" className={styles.optionalToggle} onClick={onBack}>
-        ← Bilgileri değiştir
+        {t(lang, "backToEdit")}
       </button>
     </div>
   );

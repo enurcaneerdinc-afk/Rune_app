@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import runeEngine from "../lib/rune-engine";
 import runesData from "../data/runes.json";
 import { addDraw, attachInterpretation } from "../lib/history-store";
+import { t, topicLabel, errorMessage } from "../lib/i18n";
+import { useLanguage } from "./LanguageProvider";
 import RuneWheel from "./RuneWheel";
 import styles from "./RuneDraw.module.css";
 
@@ -30,6 +32,7 @@ function truncateToSentence(text, maxChars = 260) {
 }
 
 export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) {
+  const { lang } = useLanguage();
   const [phase, setPhase] = useState("idle"); // idle | drawing | revealed
   const [wheelRotation, setWheelRotation] = useState(0);
   const [spinTargetId, setSpinTargetId] = useState(null); // dönerken tekerleğin hedefi (görsel amaçlı, henüz açıklanmadı)
@@ -37,7 +40,7 @@ export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) 
   const [previewExpanded, setPreviewExpanded] = useState(false);
   const [interpretPhase, setInterpretPhase] = useState("idle"); // idle | loading | done | error
   const [interpretResult, setInterpretResult] = useState(null);
-  const [interpretMessage, setInterpretMessage] = useState(null);
+  const [interpretReason, setInterpretReason] = useState(null);
   const timeouts = useRef([]);
   const drawRecordId = useRef(null);
 
@@ -55,7 +58,7 @@ export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) 
     setPhase("drawing");
     setInterpretPhase("idle");
     setInterpretResult(null);
-    setInterpretMessage(null);
+    setInterpretReason(null);
     drawRecordId.current = null;
 
     setWheelRotation((prev) => {
@@ -84,12 +87,12 @@ export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) 
   async function fetchInterpretation() {
     if (!result) return;
     setInterpretPhase("loading");
-    setInterpretMessage(null);
+    setInterpretReason(null);
     try {
       const res = await fetch("/api/interpret", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ drawnRune: result, personalRune, yearlyRune, topic, userName }),
+        body: JSON.stringify({ drawnRune: result, personalRune, yearlyRune, topic, userName, lang }),
       });
       const data = await res.json();
       if (data.ok) {
@@ -97,11 +100,11 @@ export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) 
         setInterpretPhase("done");
         if (drawRecordId.current) attachInterpretation(drawRecordId.current, data.data);
       } else {
-        setInterpretMessage(data.message || "Yorum şu an oluşturulamadı.");
+        setInterpretReason(data.reason || "default");
         setInterpretPhase("error");
       }
     } catch (err) {
-      setInterpretMessage("Bağlantı kurulamadı. Lütfen internet bağlantını kontrol edip tekrar dene.");
+      setInterpretReason("network_error");
       setInterpretPhase("error");
     }
   }
@@ -111,7 +114,9 @@ export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) 
 
   return (
     <div className={styles.wrap}>
-      <p className={styles.eyebrow}>{topic ? `"${topic}" için bir rune çek` : "Bir rune çek"}</p>
+      <p className={styles.eyebrow}>
+        {topic ? t(lang, "drawEyebrow", topicLabel(lang, topic)) : t(lang, "drawEyebrowDefault")}
+      </p>
 
       <div className={styles.wheelStage}>
         <div className={styles.pointer} aria-hidden="true" />
@@ -134,12 +139,12 @@ export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) 
           >
             {result.name}
           </span>
-          <span className={styles.badge}>{result.reversed ? "Ters geldi" : "Düz geldi"}</span>
+          <span className={styles.badge}>{result.reversed ? t(lang, "badgeReversed") : t(lang, "badgeUpright")}</span>
           {runeRecord && <p className={styles.subtitle}>{runeRecord.subtitle}</p>}
 
           {preview && (
             <p className={styles.preview}>
-              <span className={styles.previewLabel}>Kaynak metinden (Kehanet Mesajı):</span>{" "}
+              <span className={styles.previewLabel}>{t(lang, "sourcePreviewLabel")}</span>{" "}
               {previewExpanded ? preview.full : preview.short}
               {preview.truncated && (
                 <button
@@ -147,34 +152,31 @@ export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) 
                   className={styles.readMore}
                   onClick={() => setPreviewExpanded((v) => !v)}
                 >
-                  {previewExpanded ? " Daralt" : " Devamını oku"}
+                  {previewExpanded ? t(lang, "readLess") : t(lang, "readMore")}
                 </button>
               )}
             </p>
           )}
 
-          <p className={styles.nextStepNote}>
-            Aşağıdaki yorum yapay zeka tarafından, seçtiğin konu + yıllık rune'un + bu çekim
-            birlikte değerlendirilerek üretiliyor.
-          </p>
+          <p className={styles.nextStepNote}>{t(lang, "interpretIntro")}</p>
 
           {interpretPhase === "idle" && (
             <button type="button" className={styles.interpretButton} onClick={fetchInterpretation}>
-              Kişisel yorumu göster
+              {t(lang, "interpretShow")}
             </button>
           )}
 
           {interpretPhase === "loading" && (
             <p className={styles.interpretLoading} aria-live="polite">
-              Yorum hazırlanıyor…
+              {t(lang, "interpretLoading")}
             </p>
           )}
 
           {interpretPhase === "error" && (
             <div className={styles.interpretError} role="alert">
-              <p>{interpretMessage}</p>
+              <p>{errorMessage(lang, interpretReason)}</p>
               <button type="button" className={styles.interpretButton} onClick={fetchInterpretation}>
-                Tekrar dene
+                {t(lang, "interpretRetry")}
               </button>
             </div>
           )}
@@ -191,9 +193,9 @@ export default function RuneDraw({ topic, personalRune, yearlyRune, userName }) 
       )}
 
       <button type="button" className={styles.drawButton} onClick={draw} disabled={phase === "drawing"}>
-        {phase === "idle" && "Rune çek"}
-        {phase === "drawing" && "Çekiliyor…"}
-        {phase === "revealed" && "Tekrar çek"}
+        {phase === "idle" && t(lang, "drawButtonIdle")}
+        {phase === "drawing" && t(lang, "drawButtonDrawing")}
+        {phase === "revealed" && t(lang, "drawButtonDone")}
       </button>
     </div>
   );

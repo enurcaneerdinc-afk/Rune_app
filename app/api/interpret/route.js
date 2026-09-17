@@ -30,7 +30,7 @@ export async function POST(request) {
     );
   }
 
-  const { drawnRune, personalRune, yearlyRune, topic, userName } = body || {};
+  const { drawnRune, personalRune, yearlyRune, topic, userName, lang } = body || {};
 
   if (!drawnRune || !personalRune || !yearlyRune || !topic) {
     return NextResponse.json(
@@ -45,7 +45,7 @@ export async function POST(request) {
 
   let prompt;
   try {
-    prompt = buildInterpretationPrompt({ drawnRune, personalRune, yearlyRune, topic, runesData, userName });
+    prompt = buildInterpretationPrompt({ drawnRune, personalRune, yearlyRune, topic, runesData, userName, lang });
   } catch (err) {
     return NextResponse.json({ ok: false, reason: "bad_request", message: err.message }, { status: 400 });
   }

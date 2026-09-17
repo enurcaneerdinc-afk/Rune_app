@@ -1,5 +1,10 @@
-import UserIntakeForm from "../components/UserIntakeForm";
+"use client";
+
 import Link from "next/link";
+import UserIntakeForm from "../components/UserIntakeForm";
+import LanguageToggle from "../components/LanguageToggle";
+import { useLanguage } from "../components/LanguageProvider";
+import { t } from "../lib/i18n";
 
 const navLinkStyle = {
   fontFamily: "var(--font-mono)",
@@ -9,6 +14,7 @@ const navLinkStyle = {
 };
 
 export default function Home() {
+  const { lang } = useLanguage();
   return (
     <main>
       <div
@@ -18,14 +24,16 @@ export default function Home() {
           padding: "1.5rem 1.5rem 0",
           display: "flex",
           justifyContent: "flex-end",
+          alignItems: "center",
           gap: "1.5rem",
         }}
       >
+        <LanguageToggle />
         <Link href="/hakkinda" style={navLinkStyle}>
-          Rune nedir? →
+          {t(lang, "navAbout")}
         </Link>
         <Link href="/gecmis" style={navLinkStyle}>
-          Geçmiş çekimlerim →
+          {t(lang, "navHistory")}
         </Link>
       </div>
       <UserIntakeForm />

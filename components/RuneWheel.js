@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "./LanguageProvider";
+
 /**
  * RuneWheel — sayfanın "imza" görsel öğesi.
  *
@@ -58,11 +60,22 @@ function slicePath(index) {
 }
 
 export default function RuneWheel({ activeId = null, label = null, maxWidth = 420 }) {
+  const { lang } = useLanguage();
+  const ariaLabel =
+    lang === "en"
+      ? label
+        ? `${label} slice lit up on the birth calendar`
+        : "24-slice rune birth calendar"
+      : label
+      ? `Doğum takviminde ${label} dilimi aydınlanmış`
+      : "24 dilimlik rune doğum takvimi";
+  const centerFallback = lang === "en" ? "24 slices" : "24 dilim";
+
   return (
     <svg
       viewBox={`0 0 ${SIZE} ${SIZE}`}
       role="img"
-      aria-label={label ? `Doğum takviminde ${label} dilimi aydınlanmış` : "24 dilimlik rune doğum takvimi"}
+      aria-label={ariaLabel}
       style={{ width: "100%", height: "auto", maxWidth }}
     >
       <circle cx={CENTER} cy={CENTER} r={OUTER_R + 6} fill="none" stroke="var(--line)" strokeWidth="1" />
@@ -125,7 +138,7 @@ export default function RuneWheel({ activeId = null, label = null, maxWidth = 42
           fontSize="13"
           fill="var(--paper-dim)"
         >
-          24 dilim
+          {centerFallback}
         </text>
       )}
     </svg>
